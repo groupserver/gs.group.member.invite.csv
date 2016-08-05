@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ############################################################################
 #
-# Copyright © 2013, 2014 OnlineGroups.net and Contributors.
+# Copyright © 2013, 2014, 2016 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -15,7 +15,6 @@
 from __future__ import absolute_import, unicode_literals
 from io import BytesIO
 from json import dumps as to_json
-from chardet import detect
 from zope.cachedescriptors.property import Lazy
 from zope.contenttype import guess_content_type
 from zope.formlib import form as formlib
@@ -23,7 +22,6 @@ from gs.content.form.api.json import SiteEndpoint
 from gs.content.form.base import multi_check_box_widget
 from .interface import ICsv
 from .unicodereader import UnicodeDictReader
-from csv import Sniffer
 
 
 class CSV2JSON(SiteEndpoint):
@@ -40,25 +38,15 @@ class CSV2JSON(SiteEndpoint):
         assert retval
         return retval
 
-    @staticmethod
-    def guess_encoding(byteString):
-        d = detect(byteString)
-        retval = d['encoding'] if d['encoding'] else 'utf-8'
-        return retval
-
     @formlib.action(label='Submit', prefix='', failure='process_failure')
     def process_success(self, action, data):
         return self.actual_process(data)
 
     def actual_process(self, data):
+        # TODO: Delivery?
         cols = data['columns']
         csv = BytesIO(data['csv'])  # The file is Bytes, encoded.
-        encoding = self.guess_encoding(data['csv'])
-        # TODO: Delivery?
-
-        dialect = Sniffer().sniff(csv.read(1024))
-        csv.seek(0)
-        reader = UnicodeDictReader(csv, cols, encoding=encoding, dialect=dialect)
+        reader = UnicodeDictReader(csv, cols)
         profiles = []
         retval = None
         try:
