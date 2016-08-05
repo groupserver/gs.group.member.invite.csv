@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ############################################################################
 #
-# Copyright © 2014 OnlineGroups.net and Contributors.
+# Copyright © 2014, 2016 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -12,10 +12,51 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ############################################################################
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, unicode_literals, print_function
 from io import BytesIO
 from unittest import TestCase
 from gs.group.member.invite.csv.unicodereader import UnicodeDictReader
+from . import test_data
+
+
+class TestGuessEncoding(TestCase):
+    'Test the guessing of the encodings'
+
+    def test_guess_encoding_ascii(self):
+        'Guess ASCII?'
+        r = UnicodeDictReader.guess_encoding(BytesIO(b'Member'))
+        self.assertEqual('ascii', r)
+
+    def test_guess_encoding_latin1(self):
+        'Guess ISO Latin-1'
+        r = UnicodeDictReader.guess_encoding(BytesIO(b'M\xe9mb\xe9r'))
+        self.assertEqual('ISO-8859-2', r)
+
+    def test_guess_encoding_utf8(self):
+        'Guess UTF-8?'
+        m = BytesIO(b'\0360\0237\0230\0204 Mémbér')
+        r = UnicodeDictReader.guess_encoding(m)
+        self.assertEqual('utf-8', r)
+
+    def test_guess_encoding_image(self):
+        'Do we assume UTF-8 if we feed in an image?'
+        with test_data('gs-logo-16x16.png') as img:
+            r = UnicodeDictReader.guess_encoding(img)
+        self.assertEqual('utf-8', r)
+
+
+class TestGuessDialect(TestCase):
+    'Test the guessing of the CSV dialect'
+    def test_sniffed(self):
+        with test_data('ascii-quote.csv') as csv:
+            r = UnicodeDictReader.guess_dialect(csv)
+        self.assertEqual('sniffed', r._name)
+
+    def test_image(self):
+        'Do we assume excel if we feed in an image?'
+        with test_data('gs-logo-16x16.png') as img:
+            r = UnicodeDictReader.guess_dialect(img)
+        self.assertEqual('excel', r)
 
 
 class TestUnicodeReader(TestCase):

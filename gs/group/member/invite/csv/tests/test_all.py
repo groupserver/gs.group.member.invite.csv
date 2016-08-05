@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ############################################################################
 #
-# Copyright © 2014 OnlineGroups.net and Contributors.
+# Copyright © 2014, 2016 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -14,10 +14,8 @@
 ############################################################################
 from __future__ import absolute_import, unicode_literals
 from unittest import TestSuite, main as unittest_main
-from gs.group.member.invite.csv.tests.unicodereader import (
-    TestUnicodeReader)
-from gs.group.member.invite.csv.tests.csv2json import (
-    TestGuessEncoding, TestCSV2JSON)
+from gs.group.member.invite.csv.tests.unicodereader import (TestGuessEncoding, TestUnicodeReader)
+from gs.group.member.invite.csv.tests.csv2json import (TestCSV2JSON)
 testCases = (TestUnicodeReader, TestGuessEncoding, TestCSV2JSON)
 
 

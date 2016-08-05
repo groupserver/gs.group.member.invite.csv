@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ############################################################################
 #
-# Copyright © 2014 OnlineGroups.net and Contributors.
+# Copyright © 2014, 2016 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -15,33 +15,9 @@
 from __future__ import absolute_import, unicode_literals
 from json import dumps as to_json
 from mock import MagicMock
-import os.path
 from unittest import TestCase
 from gs.group.member.invite.csv.csv2json import CSV2JSON
-
-
-class TestGuessEncoding(TestCase):
-    'Test the CSV to JSON converter'
-
-    def test_guess_encoding_ascii(self):
-        r = CSV2JSON.guess_encoding(b'Member')
-        self.assertEqual('ascii', r)
-
-    def test_guess_encoding_latin1(self):
-        r = CSV2JSON.guess_encoding(b'M\xe9mb\xe9r')
-        self.assertEqual('ISO-8859-2', r)
-
-    def test_guess_encoding_utf8(self):
-        m = b'\0360\0237\0230\0204 Mémbér'
-        r = CSV2JSON.guess_encoding(m)
-        self.assertEqual('utf-8', r)
-
-    def test_guess_encoding_image(self):
-        iPath = os.path.join(os.path.dirname(__file__), 'gs-logo-16x16.png')
-        with open(iPath, 'r') as i:
-            m = i.read()
-        r = CSV2JSON.guess_encoding(m)
-        self.assertEqual('utf-8', r)
+from . import test_data
 
 
 class TestCSV2JSON(TestCase):
@@ -49,8 +25,7 @@ class TestCSV2JSON(TestCase):
         'Test that we error when given an image, rather than a CSV'
         data = {}
         data['columns'] = ['Name', 'Email']
-        iPath = os.path.join(os.path.dirname(__file__), 'gs-logo-16x16.png')
-        with open(iPath, 'r') as i:
+        with test_data('gs-logo-16x16.png') as i:
             data['csv'] = i.read()
         mockSite = MagicMock()
         mockRequest = MagicMock()
@@ -104,8 +79,7 @@ M\xc3\xa9mb\xc3\xa9r \xf0\x9f\x98\x84,member@example.com,28'''
         'Test that a normal CSV is fine'
         data = {}
         data['columns'] = ['Name', 'Email']
-        iPath = os.path.join(os.path.dirname(__file__), 'test-utf-8.csv')
-        with open(iPath, 'r') as i:
+        with test_data('test-utf-8.csv') as i:
             data['csv'] = i.read()
         mockSite = MagicMock()
         mockRequest = MagicMock()
