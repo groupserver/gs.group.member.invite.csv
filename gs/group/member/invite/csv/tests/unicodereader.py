@@ -47,10 +47,24 @@ class TestGuessEncoding(TestCase):
 
 class TestGuessDialect(TestCase):
     'Test the guessing of the CSV dialect'
-    def test_sniffed(self):
+
+    def assert_delimiter(self, delimiter, dialect):
+        '''Assert that the delimiter in the CSV dialect is correct'''
+        m = 'Delimiter is "{delimiter}"; expected "{dialect.delimiter}"'
+        self.assertEqual(delimiter, dialect.delimiter,
+                         m.format(delimiter=delimiter, dialect=dialect))
+
+    def test_sniff_quote_csv(self):
+        '''Test sniffing a CSV where everything is quoted'''
         with test_data('ascii-quote.csv') as csv:
             r = UnicodeDictReader.guess_dialect(csv)
-        self.assertEqual('sniffed', r._name)
+        self.assert_delimiter(',', r)
+
+    def test_sniff_quote_tsv(self):
+        '''Test sniffing a tab-seperated file where everything is quoted'''
+        with test_data('ascii-quote.tsv') as tsv:
+            r = UnicodeDictReader.guess_dialect(tsv)
+        self.assert_delimiter('\t', r)
 
     def test_image(self):
         'Do we assume excel if we feed in an image?'
@@ -71,6 +85,29 @@ class TestUnicodeReader(TestCase):
         self.assertEqual(name, item['name'], m)
         m = 'Email does not match: {0} != {1}'.format(email, item['email'])
         self.assertEqual(email, item['email'], m)
+
+    def test_csv_all_quote(self):
+        '''Test a CSV where everything is quoted'''
+        csv = BytesIO('''"Example Member","member@example.com"
+"Another Member","another@example.com"'''.encode('utf-8'))
+        u = UnicodeDictReader(csv, ['name', 'email'])
+        l = list(u)
+
+        self.assertEqual(2, len(l))
+        self.assert_name_email('Example Member', 'member@example.com', l[0])
+        self.assert_name_email('Another Member', 'another@example.com', l[1])
+
+    def test_tsv_all_quote(self):
+        '''Test a tab-seperated file where everything is quoted'''
+        s = '''"Example Member"\t"member@example.com"
+"Another Member"\t"another@example.com"'''.encode('utf-8')
+        csv = BytesIO(s)
+        u = UnicodeDictReader(csv, ['name', 'email'])
+        l = list(u)
+
+        self.assertEqual(2, len(l))
+        self.assert_name_email('Example Member', 'member@example.com', l[0])
+        self.assert_name_email('Another Member', 'another@example.com', l[1])
 
     def test_ascii(self):
         '''Ensure we read an ASCII encoded CSV'''
