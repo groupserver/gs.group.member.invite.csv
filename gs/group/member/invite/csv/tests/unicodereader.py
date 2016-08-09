@@ -91,6 +91,21 @@ class TestGuessDialect(TestCase):
 class TestUnicodeReader(TestCase):
     'Test the UnicodeDictReader'
 
+    @staticmethod
+    def make_d(name, email):
+        retval = {'name': name, 'email': email}
+        return retval
+
+    def setUp(self):
+        self.tricky_expected = [
+            self.make_d('boo', 'boo@example.com'),
+            self.make_d('Cat, Dog', 'cat_dog@example.com'),
+            self.make_d('Pete "The Mick" McTavish', 'pete@example.com'),
+            self.make_d('毛泽东', 'maozedong@example.com'),
+            self.make_d('', 'no_name@example.com'),
+            self.make_d('No Email', ''),
+            self.make_d('', ''), ]
+
     def assert_name_email(self, name, email, item):
         '''Test that a name and email address match a row from a CSV
 :param str name: The expected name.
@@ -165,3 +180,19 @@ M\xc3\xa9mb\xc3\xa9r \xf0\x9f\x98\x84,member@example.com''')
                                'mpj17@onlinegroups.net', l[0])
         self.assert_name_email('Mémbér \U0001f604',
                                'member@example.com', l[1])
+
+    def test_tricky_csv(self):
+        '''Do we successfully parse a tricky CSV file?'''
+        with test_data('tricky.csv') as csv:
+            u = UnicodeDictReader(csv, ['email', 'name'])
+            for i, row in enumerate(u):
+                self.assert_name_email(self.tricky_expected[i]['name'],
+                                       self.tricky_expected[i]['email'], row)
+
+    def test_tricky_tsv(self):
+        '''Do we successfully parse a tricky tab-seperated file?'''
+        with test_data('tricky.tsv') as tsv:
+            u = UnicodeDictReader(tsv, ['email', 'name'])
+            for i, row in enumerate(u):
+                self.assert_name_email(self.tricky_expected[i]['name'],
+                                       self.tricky_expected[i]['email'], row)
