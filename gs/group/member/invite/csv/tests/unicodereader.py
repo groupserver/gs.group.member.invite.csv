@@ -50,6 +50,7 @@ class TestGuessDialect(TestCase):
 
     def assert_delimiter(self, delimiter, dialect):
         '''Assert that the delimiter in the CSV dialect is correct'''
+        self.assertTrue(hasattr(dialect, 'delimiter'), 'Not a CSV dialect instance')
         m = 'Delimiter is "{delimiter}"; expected "{dialect.delimiter}"'
         self.assertEqual(delimiter, dialect.delimiter,
                          m.format(delimiter=delimiter, dialect=dialect))
@@ -59,6 +60,20 @@ class TestGuessDialect(TestCase):
         with test_data('ascii-quote.csv') as csv:
             r = UnicodeDictReader.guess_dialect(csv)
         self.assert_delimiter(',', r)
+
+    def test_sniff_some_csv(self):
+        '''Test sniffing a CSV where somethings are quoted'''
+        with test_data('utf8-some.csv') as csv:
+            r = UnicodeDictReader.guess_dialect(csv)
+        self.assert_delimiter(',', r)
+        self.assertTrue(r.doublequote)
+
+    def test_sniff_some_tsv(self):
+        '''Test sniffing a tab-seperated file where somethings are quoted'''
+        with test_data('utf8-some.tsv') as tsv:
+            r = UnicodeDictReader.guess_dialect(tsv)
+        self.assert_delimiter('\t', r)
+        self.assertTrue(r.doublequote)
 
     def test_sniff_quote_tsv(self):
         '''Test sniffing a tab-seperated file where everything is quoted'''
