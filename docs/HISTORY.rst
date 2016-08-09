@@ -1,6 +1,14 @@
 Changelog
 =========
 
+3.2.2 (2016-08-09)
+------------------
+
+* Detecting the dialect of the "CSV" file so tab-separated files
+  are handled, thanks to `Piers Goodhew`_
+
+.. _Piers Goodhew: http://groupserver.org/p/4PI0NlxVg75Z6a8puM0zbv
+
 3.2.1 (2016-04-11)
 ------------------
 
@@ -12,8 +20,8 @@ Changelog
 3.2.0 (2014-11-20)
 ------------------
 
-* Detect the encoding of the CSV file
-* Added unit tests
+* Detecting the encoding of the CSV file
+* Adding unit tests
 
 3.1.0 (2014-07-17)
 ------------------
