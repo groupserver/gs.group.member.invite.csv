@@ -53,7 +53,7 @@ class UnicodeDictReader(object):
         # <https://docs.python.org/2/library/csv.html#csv.Sniffer>
         s = Sniffer()
         try:
-            retval = s.sniff(f.read(1024))
+            retval = s.sniff(f.read(1024), [',', '\t', ])  # 1024 taken from the Python docs
         except CSVError:
             retval = 'excel'
         finally:
