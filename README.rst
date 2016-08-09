@@ -172,9 +172,9 @@ Resources
           ``gs.group.member.invite.base``:
           <https://github.com/groupserver/gs.group.member.invite.base>
 
-.. [#context] The form ``gs-group-member-invite-csv.json`` is also
-              available in the site context, for day that the site-wide
-              invite and add systems exist.
+.. [#context] The form ``gs-group-member-invite-csv.json`` is
+              also available in the site context, for the day
+              that the site-wide invite and add systems exist.
 
 .. [#profile] See
               <https://github.com/groupserver/gs.profile.invite>
