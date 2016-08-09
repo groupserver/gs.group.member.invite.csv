@@ -63,12 +63,17 @@ class TestUnicodeReader(TestCase):
     'Test the UnicodeDictReader'
 
     def assert_name_email(self, name, email, item):
+        '''Test that a name and email address match a row from a CSV
+:param str name: The expected name.
+:param str email: The expected email address.
+:param dict item: The row from the CSV.'''
         m = 'Name does not match: {0} != {1}'.format(name, item['name'])
         self.assertEqual(name, item['name'], m)
         m = 'Email does not match: {0} != {1}'.format(email, item['email'])
         self.assertEqual(email, item['email'], m)
 
     def test_ascii(self):
+        '''Ensure we read an ASCII encoded CSV'''
         csv = BytesIO(b'''"Michael JasonSmith",mpj17@onlinegroups.net
 Member,member@example.com''')
 
@@ -82,6 +87,7 @@ Member,member@example.com''')
                                'member@example.com', l[1])
 
     def test_latin1(self):
+        '''Ensure we read a ISO Latin-1 encoded CSV'''
         csv = BytesIO(b'''"Michael JasonSmith",mpj17@onlinegroups.net
 M\xe9mb\xe9r,member@example.com''')
 
@@ -95,6 +101,7 @@ M\xe9mb\xe9r,member@example.com''')
                                'member@example.com', l[1])
 
     def test_utf8(self):
+        '''Ensure we read a UTF-8 encoded CSV'''
         csv = BytesIO(b'''"Michael JasonSmith",mpj17@onlinegroups.net
 M\xc3\xa9mb\xc3\xa9r \xf0\x9f\x98\x84,member@example.com''')
 
